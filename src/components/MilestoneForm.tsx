@@ -12,6 +12,7 @@ const DEMO_REPOSITORY_URL = "https://github.com/example/demo";
 
 interface MilestoneFormProps {
   onSubmit: (request: EvaluationRequest) => void;
+  submitting?: boolean;
 }
 
 interface FormErrors {
@@ -32,7 +33,10 @@ const EMPTY_ERRORS: FormErrors = {
   acceptance_criteria_form: null,
 };
 
-export default function MilestoneForm({ onSubmit }: MilestoneFormProps) {
+export default function MilestoneForm({
+  onSubmit,
+  submitting = false,
+}: MilestoneFormProps) {
   const ids = {
     projectName: useId(),
     repositoryUrl: useId(),
@@ -95,6 +99,9 @@ export default function MilestoneForm({ onSubmit }: MilestoneFormProps) {
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitting) {
+      return;
+    }
 
     const result = validate();
     setErrors(result);
@@ -306,7 +313,9 @@ export default function MilestoneForm({ onSubmit }: MilestoneFormProps) {
 
       <button
         type="submit"
-        className="self-start rounded bg-black px-5 py-2 font-medium text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+        disabled={submitting}
+        aria-busy={submitting}
+        className="self-start rounded bg-black px-5 py-2 font-medium text-white hover:bg-zinc-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
       >
         Evaluate milestone
       </button>
