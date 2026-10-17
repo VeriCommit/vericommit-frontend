@@ -24,3 +24,23 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Visible focus indicator for keyboard users on every interactive element.
+   Uses focus-visible so pointer clicks do not show a ring. */
+:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :focus-visible {
+    outline-color: #93c5fd;
+  }
+}
+
+/* Programmatically focused headings (tabindex -1) are not keyboard reachable,
+   so no visible ring is needed when focus lands on them. */
+[tabindex="-1"]:focus {
+  outline: none;
+}

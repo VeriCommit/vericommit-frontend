@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import type { EvaluationResponse } from "@/types/evaluation";
 import { appConfig } from "@/lib/config";
 import { groupCriteriaByStatus } from "@/lib/report";
@@ -37,7 +38,7 @@ function EvidenceItem({
 }) {
   return (
     <li className="flex flex-col gap-0.5">
-      <span className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+      <span className="text-xs uppercase tracking-wide text-zinc-600 dark:text-zinc-400">
         {type}
       </span>
       {url ? (
@@ -45,14 +46,15 @@ function EvidenceItem({
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-600 underline dark:text-blue-400"
+          className="break-words text-blue-600 underline dark:text-blue-400"
         >
           {title}
+          <span className="sr-only"> (opens in a new tab)</span>
         </a>
       ) : (
-        <span>
+        <span className="break-words">
           {title}{" "}
-          <span className="text-sm text-zinc-500 dark:text-zinc-400">
+          <span className="text-sm text-zinc-600 dark:text-zinc-400">
             (No external URL)
           </span>
         </span>
@@ -69,6 +71,13 @@ export default function EvaluationReport({
   onBackToForm: () => void;
 }) {
   const groups = groupCriteriaByStatus(report.criteria_results);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  // Move focus to the report heading when a report appears, so keyboard and
+  // screen reader users are taken to the result.
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
 
   return (
     <article className="flex flex-col gap-6">
@@ -85,12 +94,20 @@ export default function EvaluationReport({
       </div>
 
       <header className="flex flex-col gap-2">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">
           Evaluation {report.evaluation_id}
         </p>
-        <h2 className="text-2xl font-semibold">{report.project_name}</h2>
-        <h3 className="text-lg font-medium">{report.milestone_title}</h3>
-        <p className="leading-relaxed">{report.overall_summary}</p>
+        <h2
+          ref={headingRef}
+          tabIndex={-1}
+          className="break-words text-2xl font-semibold"
+        >
+          {report.project_name}
+        </h2>
+        <h3 className="break-words text-lg font-medium">
+          {report.milestone_title}
+        </h3>
+        <p className="break-words leading-relaxed">{report.overall_summary}</p>
       </header>
 
       <ReviewerDecision
@@ -98,11 +115,8 @@ export default function EvaluationReport({
         evaluationId={report.evaluation_id}
       />
 
-      <section
-        aria-live="polite"
-        className="rounded border border-zinc-300 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-900"
-      >
-        <p className="font-medium">{HUMAN_REVIEW_NOTICE}</p>
+      <section className="rounded border border-zinc-300 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-900">
+        <p className="break-words font-medium">{HUMAN_REVIEW_NOTICE}</p>
       </section>
 
       <section className="flex flex-col gap-4">
@@ -123,19 +137,23 @@ export default function EvaluationReport({
                 key={result.criterion}
                 className="flex flex-col gap-2 rounded border border-zinc-200 p-3 dark:border-zinc-800"
               >
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <StatusBadge status={result.status} />
-                  <span className="font-medium">{result.criterion}</span>
+                  <span className="break-words font-medium">
+                    {result.criterion}
+                  </span>
                 </div>
                 {result.status === "insufficient_evidence" && (
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  <p className="break-words text-sm text-zinc-600 dark:text-zinc-400">
                     Not demonstrated by the available evidence. This does not
                     necessarily mean the work was not completed.
                   </p>
                 )}
-                <p className="leading-relaxed">{result.explanation}</p>
+                <p className="break-words leading-relaxed">
+                  {result.explanation}
+                </p>
                 {result.evidence.length === 0 ? (
-                  <div className="rounded border border-zinc-200 bg-zinc-50 p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
+                  <div className="break-words rounded border border-zinc-200 bg-zinc-50 p-3 text-sm dark:border-zinc-800 dark:bg-zinc-900">
                     <p className="font-medium">
                       No supporting evidence was identified for this criterion.
                     </p>
@@ -167,7 +185,9 @@ export default function EvaluationReport({
         <h4 className="text-lg font-semibold">Suggested next steps</h4>
         <ul className="list-disc pl-5">
           {report.suggested_next_steps.map((step) => (
-            <li key={step}>{step}</li>
+            <li key={step} className="break-words">
+              {step}
+            </li>
           ))}
         </ul>
       </section>
@@ -176,7 +196,9 @@ export default function EvaluationReport({
         <h4 className="text-lg font-semibold">Limitations</h4>
         <ul className="list-disc pl-5">
           {report.limitations.map((limitation) => (
-            <li key={limitation}>{limitation}</li>
+            <li key={limitation} className="break-words">
+              {limitation}
+            </li>
           ))}
         </ul>
       </section>
