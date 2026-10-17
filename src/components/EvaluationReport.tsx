@@ -3,6 +3,7 @@
 import type { EvaluationResponse } from "@/types/evaluation";
 import { appConfig } from "@/lib/config";
 import { groupCriteriaByStatus } from "@/lib/report";
+import ReviewerDecision from "./ReviewerDecision";
 
 const SAMPLE_LABEL =
   "Sample evidence — demonstration data, not verified GitHub evidence.";
@@ -92,8 +93,10 @@ export default function EvaluationReport({
         <p className="leading-relaxed">{report.overall_summary}</p>
       </header>
 
-      {/* The human decision step (recorded reviewer decision) will be added here
-          in a later issue. It is deliberately not implemented yet. */}
+      <ReviewerDecision
+        key={report.evaluation_id}
+        evaluationId={report.evaluation_id}
+      />
 
       <section
         aria-live="polite"
