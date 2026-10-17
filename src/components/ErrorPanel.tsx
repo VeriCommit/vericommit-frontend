@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { getUserMessage } from "@/lib/errors";
 import type { EvaluateFailure } from "@/lib/errors";
 
@@ -12,16 +13,27 @@ export default function ErrorPanel({
 }) {
   const message = getUserMessage(failure);
   const isApi = failure.kind === "api";
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  // Move focus to the error heading so keyboard and screen reader users are
+  // taken to the failure. The message below carries role="alert", so the
+  // heading is not announced twice.
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
 
   return (
-    <section
-      role="alert"
-      className="flex flex-col gap-3 rounded border border-red-300 bg-red-50 p-4 dark:border-red-700 dark:bg-red-950"
-    >
-      <h2 className="text-lg font-semibold text-red-800 dark:text-red-200">
+    <section className="flex flex-col gap-3 rounded border border-red-300 bg-red-50 p-4 dark:border-red-700 dark:bg-red-950">
+      <h2
+        ref={headingRef}
+        tabIndex={-1}
+        className="text-lg font-semibold text-red-800 dark:text-red-200"
+      >
         Evaluation could not be completed
       </h2>
-      <p className="text-red-900 dark:text-red-100">{message}</p>
+      <p role="alert" className="break-words text-red-900 dark:text-red-100">
+        {message}
+      </p>
 
       <button
         type="button"
@@ -41,11 +53,11 @@ export default function ErrorPanel({
             </div>
             <div className="flex gap-2">
               <dt className="font-medium">Error code:</dt>
-              <dd>{failure.error.code}</dd>
+              <dd className="min-w-0 break-words">{failure.error.code}</dd>
             </div>
             <div className="flex gap-2">
               <dt className="font-medium">Message:</dt>
-              <dd>{failure.error.message}</dd>
+              <dd className="min-w-0 break-words">{failure.error.message}</dd>
             </div>
           </dl>
         </details>

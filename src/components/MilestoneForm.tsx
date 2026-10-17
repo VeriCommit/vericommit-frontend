@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import type { RefObject } from "react";
 import type { EvaluationRequest } from "@/types/evaluation";
 import {
   validateAcceptanceCriteria,
@@ -13,6 +14,7 @@ const DEMO_REPOSITORY_URL = "https://github.com/example/demo";
 interface MilestoneFormProps {
   onSubmit: (request: EvaluationRequest) => void;
   submitting?: boolean;
+  headingRef?: RefObject<HTMLHeadingElement | null>;
 }
 
 interface FormErrors {
@@ -36,8 +38,10 @@ const EMPTY_ERRORS: FormErrors = {
 export default function MilestoneForm({
   onSubmit,
   submitting = false,
+  headingRef,
 }: MilestoneFormProps) {
   const ids = {
+    formHeading: useId(),
     projectName: useId(),
     repositoryUrl: useId(),
     repositoryUrlNote: useId(),
@@ -125,6 +129,15 @@ export default function MilestoneForm({
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6">
+      <h2
+        id={ids.formHeading}
+        ref={headingRef}
+        tabIndex={-1}
+        className="text-lg font-semibold"
+      >
+        Milestone details
+      </h2>
+
       <div className="flex flex-col gap-1">
         <label htmlFor={ids.projectName} className="font-medium">
           Project name
@@ -170,7 +183,7 @@ export default function MilestoneForm({
         />
         <p
           id={ids.repositoryUrlNote}
-          className="text-sm text-zinc-500 dark:text-zinc-400"
+          className="text-sm text-zinc-600 dark:text-zinc-400"
         >
           Required for both evidence modes. Sample evidence is synthetic and
           not necessarily retrieved from this repository.
@@ -190,7 +203,7 @@ export default function MilestoneForm({
         <span className="font-medium">Evidence source</span>
         <p
           id={ids.sourceNote}
-          className="text-sm text-zinc-500 dark:text-zinc-400"
+          className="text-sm text-zinc-600 dark:text-zinc-400"
         >
           Sample evidence — demonstration data, not verified GitHub evidence.
           This demo uses sample evidence only.
@@ -271,7 +284,7 @@ export default function MilestoneForm({
                   onChange={(event) => updateCriterion(index, event.target.value)}
                   aria-invalid={error !== null}
                   aria-describedby={error ? `${inputId}-error` : undefined}
-                  className="flex-1 rounded border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
+                  className="min-w-0 flex-1 rounded border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
                 />
                 <button
                   type="button"
